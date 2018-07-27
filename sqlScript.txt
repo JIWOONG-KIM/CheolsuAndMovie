@@ -1,0 +1,276 @@
+drop table movie_evaluation;
+DROP SEQUENCE mov_seq;
+
+drop table photo_comment;
+drop table photo_board;
+drop table qna_comment;
+drop table qna_board;
+drop table qna_tags;
+drop table letter;
+
+drop table friend;
+drop table member;
+
+DROP SEQUENCE photo_c_seq;
+DROP SEQUENCE photo_b_seq;
+
+DROP SEQUENCE let_seq;
+DROP SEQUENCE qna_c_seq;
+DROP SEQUENCE qna_b_seq;
+
+--민수-------------------------------------------------
+/* 회원 */
+CREATE TABLE member (
+	id VARCHAR2(30) NOT NULL, /* 아이디 */
+	pwd VARCHAR2(30) NOT NULL, /* 비밀번호 */
+	name VARCHAR2(30) NOT NULL, /* 이름 */
+	gender VARCHAR2(5) NOT NULL, /* 성별 */
+	email VARCHAR2(50) NOT NULL, /* 이메일 */
+	tel VARCHAR(11) NOT NULL, /* 전화번호 */
+    CONSTRAINT PK_member PRIMARY KEY (id)
+);
+
+insert into member
+values('admin','1q2w3e4r','관리자','m','master@google.com','01012341234');
+insert into member
+values('promsk11', '1q2w3e4r', '김민수', 'm', 'hukmkms@google.com' ,'01079335203');
+insert into member
+values('dragonjin', '1q2w3e4r', '김용진', 'm', 'dragon@google.com' ,'01012341234');
+insert into member
+values('soccerman', '1q2w3e4r', '김지웅', 'm', 'jiwoong@google.com' ,'01032711505');
+insert into member
+values('heeni', '1q2w3e4r', '김희은', 'fm', 'heeni@google.com' ,'01071843919');
+insert into member
+values('whitebear', '1q2w3e4r', '이종민', 'm', 'whitebear@google.com' ,'01021718440');
+insert into member
+values('gungyae', '1q2w3e4r', '강전욱', 'fm', 'gungyae@google.com' ,'01098990810');
+insert into member
+values('sikbbang', '1q2w3e4r', '오재원', 'm', 'sikbbang@google.com' ,'01023453435');
+insert into member
+values('dollball', '1q2w3e4r', '오승환', 'm', 'dollball@google.com' ,'01045663456');
+insert into member
+values('queen', '1q2w3e4r', '김연아', 'fm', 'queen@google.com' ,'01085730405');
+insert into member
+values('empress', '1q2w3e4r', '이상화', 'fm', 'empress@google.com' ,'01083064486');
+
+/* 친구 */
+CREATE TABLE friend (
+	id VARCHAR2(30) NOT NULL, /* 아이디 */
+	fr_id VARCHAR2(30) NOT NULL, /* 친구아이디 */
+	type NUMBER, /* 상태 */
+    CONSTRAINT PK_friend PRIMARY KEY (id, fr_id),
+    CONSTRAINT FK_member_TO_friend
+		FOREIGN KEY (id) REFERENCES member (id),
+    CONSTRAINT FK_member_TO_friend2
+		FOREIGN KEY (fr_id) REFERENCES member (id)
+);
+delete friend where type = 0;
+insert into friend values('soccerman', 'promsk11' , 0 );
+insert into friend values('whitebear', 'dragonjin' , 1 );
+insert into friend values('gungyae', 'heeni' , 2 );
+insert into friend values('dragonjin', 'soccerman' , 1 );
+insert into friend values('promsk11', 'heeni' , 1 );
+insert into friend values('queen', 'whitebear' , 2 );
+insert into friend values('sikbbang', 'dollball' , 2 );
+insert into friend values('empress', 'queen' , 0 );
+insert into friend values('gungyae', 'dragonjin' , 1 );
+insert into friend values('promsk11', 'soccerman' , 0 );
+
+--희은-------------------------------------------------
+/*  질문답변게시판태그 */
+CREATE TABLE qna_tags (
+	tags VARCHAR2(10), /* 구분 */
+    tags_name VARCHAR2(30), /* 구분(한글) */
+    CONSTRAINT PK_qna_tags PRIMARY KEY (tags)
+);
+
+insert into qna_tags values ('10', '영화찾기');
+insert into qna_tags values ('20', '해석질문');
+insert into qna_tags values ('30', '영화관');
+insert into qna_tags values ('40', 'VOD');
+
+/* 질문답변게시판 */
+CREATE TABLE qna_board (
+	seq NUMBER NOT NULL, /* 글번호 */
+	p_seq NUMBER, /* 부모글번호 */
+	user_id VARCHAR2(30), /* 아이디 */
+	tags VARCHAR2(10), /* 구분 */
+	title VARCHAR2(50), /* 제목 */
+	content LONG, /* 내용 */
+	log_time DATE, /* 작성시간 */
+	hit NUMBER, /* 조회수 */
+    CONSTRAINT PK_qna_board PRIMARY KEY (seq),
+    CONSTRAINT FK_member_TO_qna_board
+		FOREIGN KEY (user_id) REFERENCES member (id) ON DELETE CASCADE
+);
+CREATE SEQUENCE qna_b_seq start with 1;
+
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'heeni', '10', '이 영화 뭔가요???', '여자 나오고 남자 나와서 춤추는 영화 뭔지 아시는 분 있나요', sysdate, 0);
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'whitebear', '10', '이 장면 나오는 영화', '이 장면에 나오는 영화 제목 알려주세요', sysdate, 0);
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'heeni', '20', '어벤져스 결말에서' , '마지막에 타노스가 도착한 곳이 어딘가요? 무슨 풍경 바라보면서 끝나던데..', sysdate, 0);
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'gungyae', '20', '다이버전트 시리즈가 어떻게 되나요?', '이름이 다 다르던데 뭐부터 봐야되나요???', sysdate, 0);
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'heeni', '30', '서울에 어벤져스 상영하는 곳 찾아요ㅠㅠ', '아직 상영하는 곳 있나요?? 꼭 영화관가서 보고싶어요ㅠㅠ', sysdate, 0);
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'promsk11', '30', '영화관에서 볼 때 자리', '영화관가서 영화볼 때 다들 어느 자리를 선호하시나요? 전 I열 사이드가 좋더라고요', sysdate, 0);
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'heeni', '40', '영화 다운받아볼 때 질문', '자막이 없는 상태에서도 볼 수 있나요?', sysdate, 0);
+insert into qna_board (seq, p_seq, user_id, tags, title, content, log_time, hit)
+values ((qna_b_seq.nextval) - 1, 0, 'dragonjin', '40', '영화 다운받고 다른 외부기기에서 이용', '대여가 아닌 구매를 하고 사용하는 피시에서 받았는데 다른 외부기기로 이동해서 감상 할 수 있나요?', sysdate, 0);
+
+/* 질문답변댓글 */
+CREATE TABLE qna_comment (
+	c_seq NUMBER NOT NULL, /* 댓글번호 */
+	pc_seq NUMBER NOT NULL, /* 부모글번호 */
+	user_id VARCHAR2(30), /* 작성자아이디 */
+	c_content VARCHAR2(1000), /* 내용 */
+	c_log_time DATE,/* 작성시간 */
+    CONSTRAINT PK_qna_comment PRIMARY KEY (c_seq, pc_seq),
+    CONSTRAINT FK_qna_board_TO_qna_comment
+		FOREIGN KEY (pc_seq) REFERENCES qna_board (seq) ON DELETE CASCADE,
+    CONSTRAINT FK_member_TO_qna_comment
+		FOREIGN KEY (user_id) REFERENCES member (id)ON DELETE CASCADE
+);
+CREATE SEQUENCE qna_c_seq start with 1;
+
+insert into qna_comment(c_seq, pc_seq, user_id, c_content, c_log_time)
+values ((qna_c_seq.nextval) - 1, 1, 'heeni', '이것은 댓글이다', sysdate);
+insert into qna_comment(c_seq, pc_seq, user_id, c_content, c_log_time)
+values ((qna_c_seq.nextval) - 1, 1, 'promsk11', '조금 더 설명해주세요', sysdate);
+insert into qna_comment(c_seq, pc_seq, user_id, c_content, c_log_time)
+values ((qna_c_seq.nextval) - 1, 2, 'soccerman', '그건말이죠', sysdate);
+insert into qna_comment(c_seq, pc_seq, user_id, c_content, c_log_time)
+values ((qna_c_seq.nextval) - 1, 3, 'heeni', '그 장면은 바로', sysdate);
+
+--용진-------------------------------------------------
+/* 쪽지 */
+CREATE TABLE letter (
+	letter_seq NUMBER NOT NULL, /* 쪽지번호 */
+	user_id VARCHAR2(30), /* 보낸사람 */
+	title VARCHAR2(150), /* 제목 */
+	content VARCHAR2(1500), /* 내용 */
+	rcv_id VARCHAR2(30), /* 받는사람 */
+	write_date DATE, /* 보낸시간 */
+	read_date DATE, /* 읽은시간 */
+	readyn VARCHAR2(3), /* 열람여부 */
+	sent_del VARCHAR2(3), /* 보낸이삭제여부 */
+	rcv_del VARCHAR2(3), /* 받는이삭제여부 */
+    CONSTRAINT PK_letter PRIMARY KEY (letter_seq),
+    CONSTRAINT FK_member_TO_letter
+		FOREIGN KEY (user_id) REFERENCES member (id) ON DELETE CASCADE,
+    CONSTRAINT FK_member_TO_letter2
+		FOREIGN KEY (rcv_id) REFERENCES member (id) ON DELETE CASCADE
+);
+CREATE SEQUENCE let_seq start with 1;
+
+insert into letter values(let_seq.nextval,'promsk11','안녕하세요','오늘 비가 많이 
+오네요','dragonjin',sysdate,'','N','N','N');
+insert into letter values(let_seq.nextval,'soccerman','안녕하세요','오늘 비가 많이 
+오네요','heeni',sysdate,'','N','N','Y');
+insert into letter values(let_seq.nextval,'dragonjin','술 한잔ㄱ?','술먹으러 
+갑시다','gungyae',sysdate,'','N','N','N');
+insert into letter values(let_seq.nextval,'whitebear','축구봐여','내일축구이겼으면좋겠습니다
+.','gungyae',sysdate,'','N','N','Y');
+insert into letter values(let_seq.nextval,'queen','커피한잔하실래요?','날씨가춥네요.커피한잔
+하실래요?','sikbbang',sysdate,'','N','N','N');
+insert into letter values
+(let_seq.nextval,'empress','안녕하세요','안녕히가세요','queen',sysdate,'','Y','N','N');
+insert into letter values
+(let_seq.nextval,'promsk11','오늘뭐해요?','안녕히가세요','gungyae',sysdate,'','Y','N','N');
+insert into letter values
+(let_seq.nextval,'soccerman','오늘뭐먹어요?','안녕히가세요','empress',sysdate,'','N','N','N');
+insert into letter values
+(let_seq.nextval,'dragonjin','게임한판하실래요?','안녕히가세요','promsk11',sysdate,'','N','N',
+'N');
+insert into letter values(let_seq.nextval,'sikbbang','이 영화 어때요??','마블영화재밌어요. 
+같이보실래요?','whitebear',sysdate,'','N','Y','N');
+insert into letter values
+(let_seq.nextval,'whitebear','앤트맨영화나와요','영화같이보실래요?','dragonjin',sysdate,'','N'
+,'N','N');
+insert into letter values(let_seq.nextval,'whitebear','코미디/로맨스좋아하세요?','시간되시면 
+코디미/로맨스 영화 같이 보실래요?','empress',sysdate,'','N','Y','N');
+insert into letter values(let_seq.nextval,'promsk11','액션영화 어때요?','주말에 할 일 없으면 
+영화 한편 같이 보실래요??','sikbbang',sysdate,'','N','N','N');
+insert into letter values(let_seq.nextval,'dragonjin','오늘 즐거웠어요','다음에도 영화 한편 
+같이 보실래요??','dollball',sysdate,'','N','N','N');
+insert into letter values
+(let_seq.nextval,'dragonjin','내일뭐해요?','코딩하실래요?','dollball',sysdate,'','Y','N','N');
+insert into letter values
+(let_seq.nextval,'gungyae','내일뭐먹냐','빨리정해라','queen',sysdate,'','Y','N','N');
+insert into letter values(let_seq.nextval,'promsk11','오늘 즐거웠어요','다음에도 영화 한편 
+같이 보실래요??','empress',sysdate,'','Y','Y','Y');
+insert into letter values(let_seq.nextval,'gungyae','집가고싶냐?','하지만 넌 갈 수 
+없다.','dollball',sysdate,'','Y','Y','N');
+insert into letter values(let_seq.nextval,'gungyae','내것좀해줘라','내 것좀 제발 
+해줘라','dollball',sysdate,'','Y','N','Y');
+insert into letter values
+(let_seq.nextval,'gungyae','돈있냐?','얼마있냐','queen',sysdate,'','Y','N','N');
+
+--지웅-------------------------------------------------
+/* 영화평가목록 */
+CREATE TABLE movie_evaluation (
+	seq NUMBER NOT NULL, /* 번호 */
+	user_id VARCHAR2(30), /* 아이디 */
+	title VARCHAR2(300), /* 한글제목 */
+	subtitle VARCHAR2(300), /* 영문제목 */
+    image VARCHAR2(500),
+	pubDate VARCHAR2(20), /* 제작년도 */
+	director VARCHAR2(300), /* 감독 */
+	actor VARCHAR2(400), /* 배우 */
+	useRating VARCHAR2(20), /* 내평점 */
+    CONSTRAINT PK_movie_evaluation PRIMARY KEY (seq),
+    CONSTRAINT FK_member_TO_movie_evaluation
+		FOREIGN KEY (user_id) REFERENCES member (id) ON DELETE CASCADE
+);
+CREATE SEQUENCE mov_seq start with 1;
+
+--종민-------------------------------------------------
+/* 이미지게시판 */
+CREATE TABLE photo_board (
+	seq NUMBER NOT NULL, /* 글번호 */
+	user_id VARCHAR2(30), /* 유저아이디 */
+	p_title VARCHAR2(100), /* 제목 */
+	p_file_path VARCHAR2(150), /* 파일경로 */
+	p_content LONG, /* 내용 */
+	p_log_time DATE, /* 작성시간 */
+	p_hit NUMBER, /* 조회수 */
+    CONSTRAINT PK_photo_board PRIMARY KEY (seq),
+    CONSTRAINT FK_member_TO_photo_board
+		FOREIGN KEY (user_id) REFERENCES member (id)
+);
+CREATE SEQUENCE photo_b_seq start with 1;
+
+/* 이미지댓글 */
+CREATE TABLE photo_comment (
+	c_seq NUMBER NOT NULL, /* 새 컬럼 */
+	pc_seq NUMBER NOT NULL, /* 글번호 */
+	user_id VARCHAR2(30), /* 작성자아이디 */
+	c_content VARCHAR2(1000), /* 내용 */
+	c_logtime DATE, /* 작성시간 */
+    CONSTRAINT PK_photo_comment PRIMARY KEY (c_seq, pc_seq),
+    CONSTRAINT FK_photo_comment_seq
+		FOREIGN KEY (pc_seq) REFERENCES photo_board (seq) ON DELETE CASCADE,
+    CONSTRAINT FK_photo_comment_id
+		FOREIGN KEY (user_id) REFERENCES member (id) ON DELETE CASCADE
+);
+CREATE SEQUENCE photo_c_seq start with 1;
+
+
+select title, useRating, user_id from movie_evaluation order by user_id;
+desc movie_evaluation;
+
+select * from photo_comment;
+select *
+		from photo_comment
+		where pc_seq = 2
+		order by c_seq;
+delete from movie_evaluation where useRating is null;
+
+select * from QNA_COMMENT;
+commit;
+
+alter table qna_board modify (title varchar2(200));
